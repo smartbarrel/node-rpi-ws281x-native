@@ -208,6 +208,26 @@ void render(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 }
 
 /**
+* ws281x.setBrightness()
+*
+* Adjusts brightness
+*/
+void setBrightness(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  if(info.Length() != 1) {
+      return Nan::ThrowError("setBrightness(): no value given");
+  }
+
+  // first argument is a number
+  if(!info[0]->IsNumber()) {
+    return Nan::ThrowTypeError("setBrightness(): argument 0 is not a number");
+  }
+
+  ws281x.channel[0].brightness = info[0]->Int32Value(Nan::GetCurrentContext()).ToChecked();
+
+  info.GetReturnValue().SetUndefined();
+}
+
+/**
  * ws281x.finalize()
  *
  * wrap ws2811_wait() and ws2811_fini()
@@ -239,6 +259,9 @@ NAN_MODULE_INIT(InitAll) {
 
   Nan::Set(target, Nan::New<String>("render").ToLocalChecked(),
     Nan::GetFunction(Nan::New<FunctionTemplate>(render)).ToLocalChecked());
+
+  Nan::Set(target, Nan::New<String>("setBrightness").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<FunctionTemplate>(setBrightness)).ToLocalChecked());
 
   Nan::Set(target, Nan::New<String>("finalize").ToLocalChecked(),
     Nan::GetFunction(Nan::New<FunctionTemplate>(finalize)).ToLocalChecked());
